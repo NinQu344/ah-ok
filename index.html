@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ibtihal's Storybook Birthday Adventure 🌸</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sniglet:wght@400;800&family=Short+Stack&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Sniglet', 'Short Stack', cursive, sans-serif;
+            background-color: #d1b18a;
+        }
+        
+        /* Storybook Canvas styling */
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background-color: #7b8e56;
+        }
+
+        /* Quest Box Top-Left (Exact replica of screenshot style) */
+        .quest-box {
+            background: #f8ebd9;
+            border: 3.5px solid #7c3125;
+            border-radius: 12px;
+            box-shadow: 3px 4px 0px rgba(70, 30, 20, 0.35);
+            color: #7c3125;
+        }
+
+        .quest-header-badge {
+            background: #bb3f2c;
+            color: #fce8cd;
+            font-family: 'Sniglet', cursive;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            border: 2px solid #5a1d13;
+        }
+
+        /* Bottom-Right Inventory Tray (Exact replica of screenshot style) */
+        .inventory-tray {
+            background: #f8ebd9;
+            border: 3.5px solid #7c3125;
+            border-radius: 20px 0 0 20px;
+            box-shadow: -2px 4px 0px rgba(70, 30, 20, 0.3);
+        }
+
+        /* Scrollbar for modal */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f4e2ca;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #b85c43;
+            border-radius: 8px;
+        }
+
+        /* D-Pad Buttons for Mobile */
+        .dpad-btn {
+            background: #f5e4c9;
+            border: 3px solid #7c3125;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7c3125;
+            font-size: 1.4rem;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #5a1d13;
+        }
+        .dpad-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #5a1d13;
+            background: #e6cbab;
+        }
+
+        /* Hand drawn sketch border effect */
+        .sketch-border {
+            border: 3px solid #6b2e23;
+            border-radius: 18px;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen relative overflow-hidden">
+
+    <!-- GAME CANVAS -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- TOP LEFT: STORYBOOK QUEST / TASK BOX (Screenshot Replica) -->
+    <div class="fixed top-3 left-3 z-20 max-w-[240px] sm:max-w-xs w-full pointer-events-auto">
+        <div class="quest-header-badge mb-1 uppercase shadow-sm text-[10px] sm:text-xs">New Task</div>
+        <div class="quest-box p-2.5 sm:p-3 font-bold text-xs sm:text-base">
+            <div class="text-[11px] sm:text-sm font-extrabold text-[#943122] uppercase tracking-wide border-b-2 border-[#7c3125]/20 pb-1 mb-1.5">
+                📜 Find Notes For Ibtihal
+            </div>
+            <ul id="taskList" class="space-y-1 text-[11px] sm:text-sm font-semibold">
+                <li id="task1" class="flex items-center space-x-2 text-[#7c3125]">
+                    <span class="checkbox w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-[#7c3125] rounded bg-[#fff8ef] flex items-center justify-center text-[9px] sm:text-[10px] text-[#bb3f2c]"></span>
+                    <span>1. Note near cottage 🌸</span>
+                </li>
+                <li id="task2" class="flex items-center space-x-2 text-[#7c3125]/60">
+                    <span class="checkbox w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-[#7c3125]/50 rounded bg-[#fff8ef] flex items-center justify-center text-[9px] sm:text-[10px] text-[#bb3f2c]"></span>
+                    <span>2. Secret note by wood logs 💗</span>
+                </li>
+                <li id="task3" class="flex items-center space-x-2 text-[#7c3125]/60">
+                    <span class="checkbox w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-[#7c3125]/50 rounded bg-[#fff8ef] flex items-center justify-center text-[9px] sm:text-[10px] text-[#bb3f2c]"></span>
+                    <span>3. Note down dirt path 🫶</span>
+                </li>
+                <li id="task5" class="flex items-center space-x-2 text-[#7c3125]/60">
+                    <span class="checkbox w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-[#7c3125]/50 rounded bg-[#fff8ef] flex items-center justify-center text-[9px] sm:text-[10px] text-[#bb3f2c]"></span>
+                    <span>5. Final note from Yassir 🎁</span>
+                </li>
+                <li id="task6" class="hidden flex items-center space-x-2 text-[#943122] font-black animate-pulse">
+                    <span class="checkbox w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-[#943122] rounded bg-[#ffe4e1] flex items-center justify-center text-[9px] sm:text-[10px] text-[#bb3f2c]">🔑</span>
+                    <span>6. Enter the house to read letter 🏡</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- TOP RIGHT: CONTROLS & BGM TOGGLES -->
+    <div class="fixed top-4 right-4 z-20 flex space-x-2">
+        <button id="bgmToggle" class="bg-[#f8ebd9] hover:bg-[#ebd2b2] text-[#7c3125] border-2 border-[#7c3125] px-3 py-1.5 rounded-xl font-bold text-xs shadow-md transition-colors flex items-center space-x-1">
+            <span>🎵</span> <span id="bgmLabel">Music On</span>
+        </button>
+        <button id="helpBtn" class="bg-[#f8ebd9] hover:bg-[#ebd2b2] text-[#7c3125] border-2 border-[#7c3125] px-3 py-1.5 rounded-xl font-bold text-xs shadow-md transition-colors">
+            ❓ Controls
+        </button>
+    </div>
+
+    <!-- BOTTOM RIGHT: HOTBAR / INVENTORY TRAY (Screenshot Replica) -->
+    <div class="fixed bottom-3 right-0 z-20 flex items-center">
+        <div class="inventory-tray px-4 py-2 flex items-center space-x-3 sm:space-x-4">
+            <!-- Item 1: Thread Spool -->
+            <div class="w-9 h-9 sm:w-11 sm:h-11 bg-[#ebd3b2] border-2 border-[#7c3125] rounded-xl flex items-center justify-center text-lg sm:text-xl shadow-inner title="Spool">
+                🧵
+            </div>
+            <!-- Item 2: Letter Envelope -->
+            <div id="invEnvelope" class="w-9 h-9 sm:w-11 sm:h-11 bg-[#ebd3b2] border-2 border-[#7c3125] rounded-xl flex items-center justify-center text-lg sm:text-xl opacity-40 transition-opacity" title="Letters">
+                💌
+            </div>
+            <!-- Item 3: Flower 1 -->
+            <div id="invFlower1" class="w-9 h-9 sm:w-11 sm:h-11 bg-[#ebd3b2] border-2 border-[#7c3125] rounded-xl flex items-center justify-center text-lg sm:text-xl opacity-30 transition-opacity">
+                🌸
+            </div>
+            <!-- Item 4: Flower 2 -->
+            <div id="invFlower2" class="w-9 h-9 sm:w-11 sm:h-11 bg-[#ebd3b2] border-2 border-[#7c3125] rounded-xl flex items-center justify-center text-lg sm:text-xl opacity-30 transition-opacity">
+                🌺
+            </div>
+            <!-- Item 5: Big Ladybug Button -->
+            <button id="btnLadybugAction" class="w-12 h-12 sm:w-14 sm:h-14 bg-[#bb3f2c] border-3 border-[#5a1d13] rounded-full flex items-center justify-center text-2xl sm:text-3xl shadow-lg active:scale-95 transition-transform cursor-pointer relative" title="Interact / Action">
+                🐞
+            </button>
+        </div>
+    </div>
+
+    <!-- INTERACTION PROMPT BANNER -->
+    <div id="interactPrompt" class="fixed bottom-24 sm:bottom-20 left-1/2 transform -translate-x-1/2 z-20 hidden pointer-events-none">
+        <div class="bg-[#f8ebd9] text-[#7c3125] px-4 py-1.5 sm:px-5 sm:py-2 rounded-2xl font-bold shadow-2xl flex items-center space-x-2 border-3 border-[#7c3125] animate-bounce text-xs sm:text-base">
+            <span id="promptText">✨ Tap note or press <strong class="bg-[#bb3f2c] text-white px-1.5 py-0.5 rounded mx-1">🐞</strong> to read!</span>
+        </div>
+    </div>
+
+    <!-- MOBILE TOUCH DPAD -->
+    <div id="mobileControls" class="fixed bottom-4 left-3 z-30 grid grid-cols-3 gap-1 w-32 h-32 md:hidden touch-none">
+        <div></div>
+        <button id="btnUp" class="dpad-btn p-2">▲</button>
+        <div></div>
+        <button id="btnLeft" class="dpad-btn p-2">◄</button>
+        <div class="flex items-center justify-center text-[#7c3125] text-xs font-black">PAD</div>
+        <button id="btnRight" class="dpad-btn p-2">►</button>
+        <div></div>
+        <button id="btnDown" class="dpad-btn p-2">▼</button>
+        <div></div>
+    </div>
+
+    <!-- NOTE MODAL OVERLAY -->
+    <div id="noteModal" class="fixed inset-0 bg-[#3a1d16]/60 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4">
+        <div class="bg-[#f8ebd9] rounded-3xl border-4 border-[#7c3125] p-6 max-w-md w-full shadow-2xl relative text-center sketch-border">
+            <button id="closeModal" class="absolute top-3 right-3 text-[#7c3125] hover:text-[#bb3f2c] font-bold text-2xl w-9 h-9 rounded-full bg-[#ebd1b0] flex items-center justify-center border-2 border-[#7c3125]">✕</button>
+            <div id="modalHeaderIcon" class="text-5xl mb-2">🌸</div>
+            <h3 id="modalTitle" class="font-extrabold text-2xl text-[#943122] mb-3">Secret Note #1</h3>
+            <div class="bg-[#fff8ef] rounded-2xl p-4 border-2 border-[#d6b793] text-[#52251a] font-bold text-base sm:text-lg leading-relaxed shadow-inner mb-5" id="modalContent">
+                <!-- Content dynamically inserted -->
+            </div>
+            <button id="modalBtn" class="w-full bg-[#bb3f2c] hover:bg-[#a13221] text-[#fce8cd] font-bold py-3 rounded-2xl border-3 border-[#5a1d13] shadow-lg text-lg transition-transform active:scale-98">
+                Continue Exploring 🐾
+            </button>
+        </div>
+    </div>
+
+    <!-- FINAL GRAND FINALE BIRTHDAY LETTER MODAL -->
+    <div id="finalModal" class="fixed inset-0 bg-[#2b120c]/75 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#f8ebd9] rounded-3xl border-4 border-[#7c3125] p-5 sm:p-7 max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl relative sketch-border">
+            <div class="text-center mb-3">
+                <span class="text-5xl animate-bounce inline-block">🎂</span>
+                <h2 class="text-2xl sm:text-3xl text-[#943122] font-black mt-1">Happy Birthday Ibtihal! ❤️</h2>
+                <p class="text-xs text-[#7c3125] font-bold uppercase tracking-widest mt-0.5">Special Letter From Yassir</p>
+            </div>
+            
+            <!-- Scrollable Letter Area -->
+            <div class="bg-[#fff8ef] rounded-2xl p-4 sm:p-5 border-2 border-[#d6b793] text-[#4a2318] font-bold text-sm sm:text-base leading-relaxed overflow-y-auto custom-scrollbar shadow-inner space-y-4 my-2 flex-grow text-left">
+                <p class="font-black text-[#bb3f2c] text-base sm:text-lg">LOVE UUUUU ZBZOBIII ❤️</p>
+                <p>WLAHILA 3ZIZA ELIA WKHA 3AD 3RFTK W KNKTB MAJUSCUL B7ALK Z3MA HHH. ANW LAYKHLIK DIMAAAAAAAA DA7KA W 3RFI BI2ANAHO ANYIME BGHITINIII ANA HNA DIMA FOR U.</p>
+                <p>I HOPE UR HEALING 3LA AYI 7AJA MA9DITIX T3AWDIHA LIA, W XARAF LIA NKEN 3XIR MN 3XRANKKK.</p>
+                <p>W SM7ILIA RAH 3MRNI DRT B7AL HDXI GHA TL3 LI F INSTA GLT NJRB AWAL MRA N3BR HAKA HHHHHHHH.</p>
+                <p>SAMO7AT AJMII W RAKK TMAAAA ❤️</p>
+                <div class="border-t-2 border-[#d6b793] pt-3 mt-2 text-right">
+                    <p class="italic text-[#bb3f2c]">Dima for you ❤️</p>
+                    <p class="font-extrabold text-[#943122] text-lg">From Yassir 🫶</p>
+                </div>
+            </div>
+
+            <button id="closeFinalModal" class="mt-3 w-full bg-[#bb3f2c] hover:bg-[#a13221] text-[#fce8cd] font-bold py-3.5 rounded-2xl border-3 border-[#5a1d13] shadow-xl text-lg flex items-center justify-center space-x-2">
+                <span>🌸 Celebrate Again! 🎉</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- HELP MODAL -->
+    <div id="helpModal" class="fixed inset-0 bg-[#3a1d16]/50 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4">
+        <div class="bg-[#f8ebd9] rounded-3xl border-4 border-[#7c3125] p-6 max-w-sm w-full shadow-2xl text-center">
+            <h3 class="font-extrabold text-2xl text-[#943122] mb-3">How to Play 🗺️</h3>
+            <div class="text-[#52251a] font-bold text-sm space-y-2.5 mb-5 text-left bg-[#fff8ef] p-4 rounded-xl border border-[#d6b793]">
+                <p>🐾 Use <strong class="text-[#bb3f2c]">WASD / Arrow Keys</strong> or the <strong class="text-[#bb3f2c]">Mobile D-Pad</strong> to walk around the village.</p>
+                <p>📜 Find the 5 hidden envelopes scattered around the paths in order!</p>
+                <p>🐞 Press <strong class="text-[#bb3f2c]">SPACE / E</strong> or tap the <strong class="text-[#bb3f2c]">Ladybug button</strong> to inspect notes.</p>
+                <p>🎁 Complete all tasks in your quest log to open Yassir's birthday letter!</p>
+            </div>
+            <button id="closeHelpModal" class="w-full bg-[#bb3f2c] text-[#fce8cd] font-bold py-2.5 rounded-xl border-2 border-[#5a1d13] shadow">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        // Audio Synthesizer for cozy relax music and chimes
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.isMuted = false;
+                this.isPlayingBGM = false;
+                this.bgmTimer = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playTone(freq, type = 'sine', duration = 0.3, vol = 0.08) {
+                if (this.isMuted || !this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            }
+
+            playCollectSFX() {
+                this.init();
+                const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+                notes.forEach((freq, i) => {
+                    setTimeout(() => this.playTone(freq, 'triangle', 0.3, 0.12), i * 70);
+                });
+            }
+
+            playStepSFX() {
+                if (Math.random() < 0.2) {
+                    this.playTone(180 + Math.random() * 40, 'sine', 0.06, 0.015);
+                }
+            }
+
+            startBGM() {
+                this.init();
+                if (this.isPlayingBGM) return;
+                this.isPlayingBGM = true;
+
+                const scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33];
+                let beat = 0;
+
+                this.bgmTimer = setInterval(() => {
+                    if (this.isMuted) return;
+                    if (beat % 2 === 0) {
+                        const note = scale[Math.floor(Math.random() * scale.length)];
+                        this.playTone(note, 'sine', 0.9, 0.025);
+                    }
+                    beat++;
+                }, 450);
+            }
+
+            toggleBGM() {
+                this.isMuted = !this.isMuted;
+                return !this.isMuted;
+            }
+        }
+
+        const audioEngine = new SoundEngine();
+
+        // Canvas Setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Map Size
+        const MAP_WIDTH = 1800;
+        const MAP_HEIGHT = 1600;
+
+        // Player (Purple Hippo / Mascot Character)
+        const player = {
+            x: 450,
+            y: 420,
+            targetX: null,
+            targetY: null,
+            radius: 20,
+            speed: 4.2,
+            dx: 0,
+            dy: 0,
+            facing: 'down',
+            animFrame: 0,
+            animTimer: 0
+        };
+
+        // Companion Pet (Ladybug)
+        const pet = {
+            x: 420,
+            y: 440,
+            targetX: 420,
+            targetY: 440,
+            radius: 10
+        };
+
+        // Story Notes
+        const notes = [
+            {
+                id: 1,
+                x: 620,
+                y: 380,
+                title: "First Note 🌸",
+                text: "“Hanti, jitk f dakchi ta3 romansiya game mzebzba, walakin 9bli 3lia ❤️”",
+                collected: false,
+                locationHint: "Near the Cottage"
+            },
+            {
+                id: 2,
+                x: 880,
+                y: 280,
+                title: "Second Note 💗",
+                text: "“Mazal masalinaaa 😭 kaynin lokhrin… bach t9dri t7li l-letter 💌”",
+                collected: false,
+                locationHint: "By the Wood Logs"
+            },
+            {
+                id: 3,
+                x: 1250,
+                y: 750,
+                title: "Third Note 🫶",
+                text: "“Wlahila a7san drya 3reft f 7yati, lay7fdk lina yarbi ❤️”",
+                collected: false,
+                locationHint: "Down the Dirt Path"
+            },
+            {
+                id: 5,
+                x: 320,
+                y: 1100,
+                title: "Final Note 🎁",
+                text: "“Anktb lik wa7d l9wada mn l9lb, yarbi manzblhax ❤️”",
+                collected: false,
+                locationHint: "At the Village End"
+            }
+        ];
+
+        let collectedCount = 0;
+        let activeNoteNear = null;
+        let isHouseUnlocked = false;
+        let isNearDoor = false;
+
+        // Cottage door position on map
+        const COTTAGE_DOOR = { x: 490, y: 225 };
+
+        // Key listeners
+        const keys = {};
+
+        // Mobile Tap-To-Move and Direct Object Interaction Support
+        function handleScreenTouch(clientX, clientY) {
+            audioEngine.startBGM();
+
+            // Ignore tap if touching UI elements like buttons or quest log
+            const el = document.elementFromPoint(clientX, clientY);
+            if (el && (el.closest('button') || el.closest('.quest-box') || el.closest('.inventory-tray') || el.closest('#noteModal') || el.closest('#finalModal') || el.closest('#helpModal'))) {
+                return;
+            }
+
+            const camX = player.x - canvas.width / 2;
+            const camY = player.y - canvas.height / 2;
+            const worldX = clientX + camX;
+            const worldY = clientY + camY;
+
+            // Direct tap interaction check for notes
+            let clickedNote = null;
+            notes.forEach(note => {
+                const dist = Math.hypot(worldX - note.x, worldY - note.y);
+                if (dist < 45) clickedNote = note;
+            });
+
+            // Direct tap interaction for cottage door
+            const doorDist = Math.hypot(worldX - COTTAGE_DOOR.x, worldY - COTTAGE_DOOR.y);
+
+            if (clickedNote) {
+                player.targetX = clickedNote.x;
+                player.targetY = clickedNote.y;
+            } else if (doorDist < 50 && isHouseUnlocked) {
+                player.targetX = COTTAGE_DOOR.x;
+                player.targetY = COTTAGE_DOOR.y;
+            } else {
+                player.targetX = worldX;
+                player.targetY = worldY;
+            }
+        }
+
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                handleScreenTouch(touch.clientX, touch.clientY);
+            }
+        }, { passive: false });
+
+        window.addEventListener('mousedown', (e) => {
+            handleScreenTouch(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+            player.targetX = null; // Keyboard movement overrides touch target
+            player.targetY = null;
+            audioEngine.startBGM();
+
+            if (e.key === ' ' || e.key.toLowerCase() === 'e') {
+                if (isNearDoor && isHouseUnlocked) {
+                    triggerGrandFinale();
+                } else if (activeNoteNear) {
+                    interactWithNote();
+                }
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        // Setup Mobile Controls
+        function setupMobileControls() {
+            const bindBtn = (id, key) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const start = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    keys[key] = true;
+                    player.targetX = null;
+                    player.targetY = null;
+                    audioEngine.startBGM();
+                };
+                const end = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    keys[key] = false;
+                };
+                el.addEventListener('touchstart', start, { passive: false });
+                el.addEventListener('touchend', end, { passive: false });
+                el.addEventListener('mousedown', start);
+                el.addEventListener('mouseup', end);
+            };
+
+            bindBtn('btnUp', 'arrowup');
+            bindBtn('btnDown', 'arrowdown');
+            bindBtn('btnLeft', 'arrowleft');
+            bindBtn('btnRight', 'arrowright');
+
+            const ladybugAction = document.getElementById('btnLadybugAction');
+            const handleLadybug = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                audioEngine.startBGM();
+                if (isNearDoor && isHouseUnlocked) {
+                    triggerGrandFinale();
+                } else if (activeNoteNear) {
+                    interactWithNote();
+                }
+            };
+            ladybugAction.addEventListener('click', handleLadybug);
+            ladybugAction.addEventListener('touchstart', handleLadybug, { passive: false });
+        }
+        setupMobileControls();
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function interactWithNote() {
+            if (!activeNoteNear) return;
+
+            const expected = notes.find(n => !n.collected);
+            if (expected && activeNoteNear.id !== expected.id) {
+                showModal("Wait a second! 📜", `Please find Note #${expected.id} (${expected.locationHint}) first!`, "Got it!");
+                return;
+            }
+
+            if (!activeNoteNear.collected) {
+                activeNoteNear.collected = true;
+                collectedCount++;
+                audioEngine.playCollectSFX();
+
+                const taskEl = document.getElementById(`task${activeNoteNear.id}`);
+                if (taskEl) {
+                    taskEl.className = "flex items-center space-x-2 text-[#2e5d1c] line-through font-bold";
+                    const checkMark = taskEl.querySelector('.checkbox');
+                    if (checkMark) {
+                        checkMark.innerHTML = "✓";
+                        checkMark.className = "checkbox w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-[#2e5d1c] rounded bg-[#bbf7d0] flex items-center justify-center text-[10px] text-[#166534] font-extrabold";
+                    }
+                }
+
+                if (activeNoteNear.id < 5) {
+                    const nextId = activeNoteNear.id === 3 ? 5 : activeNoteNear.id + 1;
+                    const nextTask = document.getElementById(`task${nextId}`);
+                    if (nextTask) nextTask.className = "flex items-center space-x-2 text-[#7c3125] font-bold";
+                }
+
+                if (collectedCount >= 1) document.getElementById('invEnvelope').classList.remove('opacity-40');
+                if (collectedCount >= 2) document.getElementById('invFlower1').classList.remove('opacity-30');
+                if (collectedCount >= 4) document.getElementById('invFlower2').classList.remove('opacity-30');
+
+                showNoteModal(activeNoteNear);
+
+                if (collectedCount === 4) {
+                    isHouseUnlocked = true;
+                    const task6 = document.getElementById('task6');
+                    if (task6) task6.classList.remove('hidden');
+                }
+            }
+        }
+
+        // UPDATE GAME LOGIC
+        function updatePlayer() {
+            let dx = 0;
+            let dy = 0;
+
+            if (keys['arrowup'] || keys['w']) dy -= 1;
+            if (keys['arrowdown'] || keys['s']) dy += 1;
+            if (keys['arrowleft'] || keys['a']) dx -= 1;
+            if (keys['arrowright'] || keys['d']) dx += 1;
+
+            if (dx !== 0 && dy !== 0) {
+                dx *= 0.7071;
+                dy *= 0.7071;
+            }
+
+            if (dx !== 0 || dy !== 0) {
+                player.dx = dx * player.speed;
+                player.dy = dy * player.speed;
+                player.x += player.dx;
+                player.y += player.dy;
+                player.targetX = null; // Cancel point-and-click if arrow keys used
+                player.targetY = null;
+            } else if (player.targetX !== null && player.targetY !== null) {
+                // Smooth movement towards tap/touch target point
+                const distToTarget = Math.hypot(player.targetX - player.x, player.targetY - player.y);
+                if (distToTarget > 6) {
+                    const angle = Math.atan2(player.targetY - player.y, player.targetX - player.x);
+                    player.dx = Math.cos(angle) * player.speed;
+                    player.dy = Math.sin(angle) * player.speed;
+                    player.x += player.dx;
+                    player.y += player.dy;
+                } else {
+                    player.targetX = null;
+                    player.targetY = null;
+                    player.dx = 0;
+                    player.dy = 0;
+                }
+            } else {
+                player.dx = 0;
+                player.dy = 0;
+            }
+
+            if (player.dx !== 0 || player.dy !== 0) {
+                player.x = Math.max(50, Math.min(MAP_WIDTH - 50, player.x));
+                player.y = Math.max(50, Math.min(MAP_HEIGHT - 50, player.y));
+
+                player.animTimer++;
+                if (player.animTimer % 10 === 0) {
+                    player.animFrame = (player.animFrame + 1) % 4;
+                    audioEngine.playStepSFX();
+                }
+            }
+
+            // Pet companion movement (Ladybug follows player)
+            const targetX = player.x - 30;
+            const targetY = player.y + 10;
+            pet.x += (targetX - pet.x) * 0.08;
+            pet.y += (targetY - pet.y) * 0.08;
+
+            // Check note proximity
+            activeNoteNear = null;
+            notes.forEach(note => {
+                const dist = Math.hypot(player.x - note.x, player.y - note.y);
+                if (dist < 60) {
+                    activeNoteNear = note;
+                }
+            });
+
+            // Check door proximity
+            const doorDist = Math.hypot(player.x - COTTAGE_DOOR.x, player.y - COTTAGE_DOOR.y);
+            isNearDoor = doorDist < 55;
+
+            const promptEl = document.getElementById('interactPrompt');
+            const promptText = document.getElementById('promptText');
+
+            if (isNearDoor && isHouseUnlocked) {
+                promptText.innerHTML = "🔑 Tap door or press <strong class=\"bg-[#bb3f2c] text-white px-1.5 py-0.5 rounded mx-1\">🐞</strong> to enter house!";
+                promptEl.classList.remove('hidden');
+            } else if (activeNoteNear && !activeNoteNear.collected) {
+                promptText.innerHTML = "✨ Tap note or press <strong class=\"bg-[#bb3f2c] text-white px-1.5 py-0.5 rounded mx-1\">🐞</strong> to read!";
+                promptEl.classList.remove('hidden');
+            } else {
+                promptEl.classList.add('hidden');
+            }
+        }
+
+        // DRAW MAP & RENDER SCREENSHOT MATCHING ARTWORK
+        function drawMap(camX, camY) {
+            // Base Olive/Sage Green Grass
+            ctx.fillStyle = '#83965c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Paper Texture Tint Overlay
+            ctx.fillStyle = 'rgba(248, 235, 217, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // --- DRAW TERRATCOTTA DIRT WINDING PATHS ---
+            ctx.save();
+            ctx.strokeStyle = '#c98a63';
+            ctx.lineWidth = 110;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(100 - camX, 420 - camY);
+            ctx.lineTo(800 - camX, 420 - camY);
+            ctx.lineTo(1300 - camX, 750 - camY);
+            ctx.lineTo(1300 - camX, 1300 - camY);
+            ctx.lineTo(300 - camX, 1200 - camY);
+            ctx.stroke();
+
+            // Inner lighter dirt path details
+            ctx.strokeStyle = '#dca078';
+            ctx.lineWidth = 85;
+            ctx.stroke();
+            ctx.restore();
+
+            // Grass tufts
+            ctx.strokeStyle = '#5f733b';
+            ctx.lineWidth = 2.5;
+            for (let x = 100; x < MAP_WIDTH; x += 120) {
+                for (let y = 100; y < MAP_HEIGHT; y += 120) {
+                    const gx = x - camX;
+                    const gy = y - camY;
+                    ctx.beginPath();
+                    ctx.moveTo(gx, gy);
+                    ctx.quadraticCurveTo(gx - 4, gy - 8, gx - 8, gy - 2);
+                    ctx.moveTo(gx, gy);
+                    ctx.quadraticCurveTo(gx + 4, gy - 10, gx + 8, gy - 1);
+                    ctx.stroke();
+                }
+            }
+
+            // --- DRAW COZY COTTAGE / HOUSE ---
+            const hx = 350 - camX;
+            const hy = 80 - camY;
+
+            ctx.fillStyle = '#f3dfcc';
+            ctx.fillRect(hx, hy, 280, 220);
+            ctx.strokeStyle = '#4a251a';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(hx, hy, 280, 220);
+
+            // Roof
+            ctx.fillStyle = '#7a3b30';
+            ctx.beginPath();
+            ctx.moveTo(hx - 20, hy);
+            ctx.lineTo(hx + 140, hy - 70);
+            ctx.lineTo(hx + 300, hy);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Shutters & Door
+            if (isHouseUnlocked) {
+                const pulse = Math.sin(Date.now() / 250) * 8 + 10;
+                ctx.fillStyle = 'rgba(250, 204, 21, 0.45)';
+                ctx.beginPath();
+                ctx.arc(hx + 140, hy + 175, 45 + pulse, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#b45309';
+                ctx.fillRect(hx + 115, hy + 130, 50, 90);
+                ctx.strokeStyle = '#fef08a';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(hx + 115, hy + 130, 50, 90);
+
+                ctx.font = '22px sans-serif';
+                ctx.fillText('🔑', hx + 128, hy + 115);
+            } else {
+                ctx.fillStyle = '#372b54';
+                ctx.fillRect(hx + 115, hy + 130, 50, 90);
+                ctx.strokeRect(hx + 115, hy + 130, 50, 90);
+            }
+
+            ctx.fillStyle = '#eab308';
+            ctx.beginPath();
+            ctx.arc(hx + 155, hy + 175, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hanging Sign
+            ctx.fillStyle = '#1e162a';
+            ctx.fillRect(hx + 120, hy + 145, 30, 18);
+            ctx.strokeRect(hx + 120, hy + 145, 30, 18);
+
+            // Stacked Logs
+            const lx = hx + 295;
+            const ly = hy + 60;
+            ctx.fillStyle = '#8c4836';
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 5 - row; col++) {
+                    const logX = lx + col * 18 + row * 9;
+                    const logY = ly + row * 16;
+                    ctx.beginPath();
+                    ctx.arc(logX, logY, 10, 0, Math.PI * 2);
+                    ctx.fillStyle = '#9a533f';
+                    ctx.fill();
+                    ctx.strokeStyle = '#4a251a';
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(logX, logY, 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+
+            // Berry Bushes
+            const drawBush = (bx, by) => {
+                ctx.fillStyle = '#4d6932';
+                ctx.beginPath();
+                ctx.arc(bx, by, 26, 0, Math.PI * 2);
+                ctx.arc(bx + 20, by - 10, 22, 0, Math.PI * 2);
+                ctx.arc(bx + 35, by + 10, 24, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#2b3f1b';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                ctx.fillStyle = '#be2742';
+                [ [bx, by - 5], [bx + 18, by - 18], [bx + 30, by + 5], [bx + 10, by + 15] ].forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p[0], p[1], 4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            };
+            drawBush(hx - 50, hy + 120);
+            drawBush(700 - camX, 1100 - camY);
+            drawBush(1200 - camX, 600 - camY);
+
+            // Notes
+            notes.forEach(note => {
+                const nx = note.x - camX;
+                const ny = note.y - camY;
+
+                ctx.save();
+                if (!note.collected) {
+                    const pulse = Math.sin(Date.now() / 200) * 5;
+                    ctx.beginPath();
+                    ctx.arc(nx, ny, 22 + pulse, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(248, 235, 217, 0.5)';
+                    ctx.fill();
+
+                    ctx.fillStyle = '#f8ebd9';
+                    ctx.fillRect(nx - 16, ny - 12, 32, 24);
+                    ctx.strokeStyle = '#7c3125';
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(nx - 16, ny - 12, 32, 24);
+
+                    ctx.beginPath();
+                    ctx.moveTo(nx - 16, ny - 12);
+                    ctx.lineTo(nx, ny + 2);
+                    ctx.lineTo(nx + 16, ny - 12);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#bb3f2c';
+                    ctx.beginPath();
+                    ctx.arc(nx, ny - 2, 4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#7c3125';
+                    ctx.font = 'bold 12px Sniglet, cursive';
+                    ctx.fillText(`#${note.id}`, nx - 6, ny + 28);
+                } else {
+                    ctx.font = '16px sans-serif';
+                    ctx.fillText('✨', nx - 8, ny + 6);
+                }
+                ctx.restore();
+            });
+
+            drawLadybug(pet.x - camX, pet.y - camY);
+            drawCharacter(player.x - camX, player.y - camY);
+        }
+
+        function drawCharacter(cx, cy) {
+            ctx.save();
+
+            ctx.fillStyle = 'rgba(40, 20, 10, 0.25)';
+            ctx.beginPath();
+            ctx.ellipse(cx, cy + 18, 16, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#7c43a5';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#3e1759';
+            ctx.lineWidth = 3.5;
+            ctx.stroke();
+
+            ctx.fillStyle = '#b788dc';
+            ctx.beginPath();
+            ctx.arc(cx, cy + 3, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#b788dc';
+            ctx.beginPath();
+            ctx.ellipse(cx, cy - 6, 12, 9, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#3e1759';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.fillStyle = '#7c43a5';
+            ctx.beginPath();
+            ctx.arc(cx - 12, cy - 18, 6, 0, Math.PI * 2);
+            ctx.arc(cx + 12, cy - 18, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#e2b3f7';
+            ctx.beginPath();
+            ctx.arc(cx - 12, cy - 18, 3, 0, Math.PI * 2);
+            ctx.arc(cx + 12, cy - 18, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#230b33';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(cx - 5, cy - 9, 2.5, Math.PI, 0);
+            ctx.arc(cx + 5, cy - 9, 2.5, Math.PI, 0);
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(cx + 4, cy - 3, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawLadybug(lx, ly) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.beginPath();
+            ctx.ellipse(lx, ly + 8, 10, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#bd2c22';
+            ctx.beginPath();
+            ctx.arc(lx, ly, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#4a0d08';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            ctx.fillStyle = '#1c0806';
+            ctx.beginPath();
+            ctx.arc(lx - 8, ly, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(lx - 4, ly);
+            ctx.lineTo(lx + 10, ly);
+            ctx.stroke();
+
+            ctx.fillStyle = '#1c0806';
+            [ [lx - 1, ly - 4], [lx + 4, ly - 3], [lx - 1, ly + 4], [lx + 4, ly + 3] ].forEach(pt => {
+                ctx.beginPath();
+                ctx.arc(pt[0], pt[1], 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.restore();
+        }
+
+        // MAIN GAME LOOP
+        function gameLoop() {
+            updatePlayer();
+
+            const camX = player.x - canvas.width / 2;
+            const camY = player.y - canvas.height / 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawMap(camX, camY);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // MODAL HELPERS
+        function showNoteModal(note) {
+            document.getElementById('modalHeaderIcon').innerText = "💌";
+            document.getElementById('modalTitle').innerText = note.title;
+            document.getElementById('modalContent').innerText = note.text;
+
+            const modal = document.getElementById('noteModal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('noteModal').classList.add('hidden');
+        }
+
+        function showModal(title, text, btnText = "OK") {
+            document.getElementById('modalHeaderIcon').innerText = "🌸";
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalContent').innerText = text;
+            document.getElementById('modalBtn').innerText = btnText;
+
+            const modal = document.getElementById('noteModal');
+            modal.classList.remove('hidden');
+        }
+
+        function triggerGrandFinale() {
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+            }
+            document.getElementById('finalModal').classList.remove('hidden');
+        }
+
+        // LISTENERS
+        document.getElementById('modalBtn').addEventListener('click', closeModal);
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        document.getElementById('closeFinalModal').addEventListener('click', () => {
+            document.getElementById('finalModal').classList.add('hidden');
+            if (typeof confetti === 'function') confetti({ particleCount: 200, spread: 100 });
+        });
+
+        document.getElementById('bgmToggle').addEventListener('click', () => {
+            const active = audioEngine.toggleBGM();
+            document.getElementById('bgmLabel').innerText = active ? "Music On" : "Muted";
+        });
+
+        document.getElementById('helpBtn').addEventListener('click', () => {
+            document.getElementById('helpModal').classList.remove('hidden');
+        });
+        document.getElementById('closeHelpModal').addEventListener('click', () => {
+            document.getElementById('helpModal').classList.add('hidden');
+        });
+
+        window.onload = function() {
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
